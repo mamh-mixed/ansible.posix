@@ -299,7 +299,12 @@ class ActionModule(ActionBase):
                 if localhost_shell:
                     break
             else:
-                localhost_shell = os.path.basename(C.DEFAULT_EXECUTABLE)
+                for shell_var in C.MAGIC_VARIABLE_MAPPING['shell']:
+                    localhost_shell = task_vars.get(shell_var, None)
+                    if localhost_shell:
+                        break
+                if not localhost_shell:
+                    localhost_shell = os.path.basename(C.DEFAULT_EXECUTABLE)
             self._play_context.shell = localhost_shell
 
             # Unlike port, there can be only one executable
@@ -313,7 +318,12 @@ class ActionModule(ActionBase):
                 if localhost_executable:
                     break
             else:
-                localhost_executable = C.DEFAULT_EXECUTABLE
+                for executable_var in C.MAGIC_VARIABLE_MAPPING['executable']:
+                    localhost_executable = task_vars.get(executable_var, None)
+                    if localhost_executable:
+                        break
+                if not localhost_executable:
+                    localhost_executable = C.DEFAULT_EXECUTABLE
             self._play_context.executable = localhost_executable
 
             new_connection = connection_loader.get('local', self._play_context, new_stdin)
